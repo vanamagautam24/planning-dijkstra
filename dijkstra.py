@@ -52,6 +52,29 @@ class Node:
         else:
             return False
 
+    def common_move(self, potential_node, direction_val, direction):
+        """ Common function - Contains  steps which are frequently used. Think of it as a utility function."""
+        if not self.check_obstacle_space(potential_node):
+            move_node = Node(copy.deepcopy(self.state), Node(self.state, self.parent, self.cost, self.distance), self.cost + direction_val, direction_val)
+            if direction == 'up':
+                move_node.state[1] = move_node.state[1] + 1
+            elif direction == 'down':
+                move_node.state[1] = move_node.state[1] - 1
+            elif direction == 'left':
+                move_node.state[0] = move_node.state[0] - 1
+            elif direction == 'right':
+                move_node.state[0] = move_node.state[0] + 1
+            elif direction == 'up_left':
+                move_node.state[0], move_node.state[1]  = move_node.state[0] - 1, move_node.state[1] + 1
+            elif direction == 'up_right':
+                move_node.state[0], move_node.state[1]  = move_node.state[0] + 1, move_node.state[1] + 1
+            elif direction == 'down_left':
+                move_node.state[0], move_node.state[1]  = move_node.state[0] - 1, move_node.state[1] - 1
+            elif direction == 'down_right':
+                move_node.state[0], move_node.state[1]  = move_node.state[0] - 1, move_node.state[1] - 1
+            return move_node
+        return None
+
 
 pygame.init()
 
