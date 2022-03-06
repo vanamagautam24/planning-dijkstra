@@ -53,7 +53,7 @@ class Node:
             return False
 
     def common_move(self, potential_node, direction_val, direction):
-        """ Common function - Contains  steps which are frequently used. Think of it as a utility function."""
+        """ Common function - Contains steps which are frequently used for directions. Think of it as a utility function."""
         if not self.check_obstacle_space(potential_node):
             move_node = Node(copy.deepcopy(self.state), Node(self.state, self.parent, self.cost, self.distance), self.cost + direction_val, direction_val)
             if direction == 'up':
@@ -74,6 +74,47 @@ class Node:
                 move_node.state[0], move_node.state[1]  = move_node.state[0] - 1, move_node.state[1] - 1
             return move_node
         return None
+
+    # direction methods
+    def up(self):
+        potential_node = (self.state[0], self.state[1] + 1)
+        up_node = self.common_move(potential_node, 1, "up")
+        return up_node
+
+    def down(self):
+        potential_node = (self.state[0], self.state[1] - 1)
+        down_node = self.common_move(potential_node, 1, "down")
+        return down_node
+
+    def left(self):
+        potential_node = (self.state[0] - 1, self.state[1])
+        left_node = self.common_move(potential_node, 1, "left")
+        return left_node
+
+    def right(self):
+        potential_node = (self.state[0] + 1, self.state[1])
+        right_node = self.common_move(potential_node, 1, "right")
+        return right_node
+    
+    def up_left(self):
+        potential_node = (self.state[0] - 1, self.state[1] + 1)
+        up_left = self.common_move(potential_node, 1.414, "up_left")
+        return up_left
+    
+    def up_right(self):
+        potential_node = (self.state[0] + 1, self.state[1] + 1)
+        up_right = self.common_move(potential_node, 1.414, "up_right")
+        return up_right
+
+    def down_left(self):
+        potential_node = (self.state[0] - 1, self.state[1] - 1)
+        down_left = self.common_move(potential_node, 1.414, "down_left")
+        return down_left
+
+    def down_right(self):
+        potential_node = (self.state[0] + 1, self.state[1] - 1)
+        down_right = self.common_move(potential_node, 1.414, "down_right")
+        return down_right
 
 
 pygame.init()
