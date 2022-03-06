@@ -116,6 +116,42 @@ class Node:
         down_right = self.common_move(potential_node, 1.414, "down_right")
         return down_right
 
+    def generate_children(self):
+        """ Generates children by registering switch_ dispatcher """
+        children = []
+        @self.switch_
+        def move():
+            return "Invalid move"
+        
+        move.register("up")(lambda: children.append(self.up()))
+        move.register("down")(lambda: children.append(self.down()))
+        move.register("left")(lambda: children.append(self.left()))
+        move.register("right")(lambda: children.append(self.right()))  
+        move.register("up_left")(lambda: children.append(self.up_left()))       
+        move.register("up_right")(lambda: children.append(self.up_right()))       
+        move.register("down_left")(lambda: children.append(self.down_left()))       
+        move.register("down_right")(lambda: children.append(self.down_right()))  
+
+        if self.up():
+            move("up")
+        if self.down():
+            move("down")
+        if self.left():
+            move("left")
+        if self.right():
+            move("right")
+        if self.up_left():
+            move("up_left")
+        if self.up_right():
+            move("up_right")
+        if self.down_left():
+            move("down_left")
+        if self.down_right():
+            move("down_right")
+        
+        return children
+    
+
 
 pygame.init()
 
