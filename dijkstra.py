@@ -16,6 +16,10 @@ class Node:
         return str(self.state)
     
     def switch_(self, fn):
+        """ Single Dispatcher for replicating a switch type operation. 
+            note - There is no built-in method in python for switch.
+            A decorator is created to perform switch operation
+        """
         registry = dict()
         registry['default'] = fn
 
@@ -31,6 +35,22 @@ class Node:
         
         decorator.register = register
         return decorator
+
+    def check_obstacle_space(self, potential_node):
+        """ check_obstacle_space checks for obstacles. If the start node and goal node lies in the obstacle space
+            then the function returns True indicating that the points fall in the obstacle space. If the coordinate points don't fall in the obstacle space False is returned.
+        """
+        x, y = potential_node[0], potential_node[1]
+        if (x < 0) or (x > 400) or (y < 0) or (y > 250):
+            return True
+        if ((x - 300) ** 2 + (y - 185) ** 2 - 45 * 45) <= 0:
+            return True
+        elif ((0.316 * x + 178.608 - y) >= 0 and (0.857 * x + 106.429 - y) <= 0 and (-0.114 * x + 189.091 - y) <= 0) or ((-3.2 * x + 450 - y) >= 0 and (-1.232 * x + 220.348 - y) <= 0 and not (-0.114 * x + 189.091 - y) <= 0):
+            return True
+        elif (-0.571 * x + 174.286 - y) <= 0 and (160 - x) <= 0 and (0.571 * x + 25.714 - y) >= 0 and (-0.575 * x + 261 - y) >= 0 and (240 - x) >= 0 and (0.571 * x - 54.286 - y) <= 0:
+            return True
+        else:
+            return False
 
 
 pygame.init()
