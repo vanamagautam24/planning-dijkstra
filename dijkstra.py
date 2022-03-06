@@ -1,6 +1,4 @@
 import time
-import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import sys
 import copy
@@ -16,10 +14,6 @@ class Node:
         return str(self.state)
     
     def switch_(self, fn):
-        """ Single Dispatcher for replicating a switch type operation. 
-            note - There is no built-in method in python for switch.
-            A decorator is created to perform switch operation
-        """
         registry = dict()
         registry['default'] = fn
 
@@ -37,9 +31,6 @@ class Node:
         return decorator
 
     def check_obstacle_space(self, potential_node):
-        """ check_obstacle_space checks for obstacles. If the start node and goal node lies in the obstacle space
-            then the function returns True indicating that the points fall in the obstacle space. If the coordinate points don't fall in the obstacle space False is returned.
-        """
         x, y = potential_node[0], potential_node[1]
         if (x < 0) or (x > 400) or (y < 0) or (y > 250):
             return True
@@ -47,13 +38,12 @@ class Node:
             return True
         elif ((0.316 * x + 178.608 - y) >= 0 and (0.857 * x + 106.429 - y) <= 0 and (-0.114 * x + 189.091 - y) <= 0) or ((-3.2 * x + 450 - y) >= 0 and (-1.232 * x + 220.348 - y) <= 0 and not (-0.114 * x + 189.091 - y) <= 0):
             return True
-        elif (-0.571 * x + 174.286 - y) <= 0 and (160 - x) <= 0 and (0.571 * x + 25.714 - y) >= 0 and (-0.575 * x + 261 - y) >= 0 and (240 - x) >= 0 and (0.571 * x - 54.286 - y) <= 0:
+        elif (-0.575 * x + 169 - y) <= 0 and (160 - x) <= 0 and (0.575 * x + 31 - y) >= 0 and (-0.575 * x + 261 - y) >= 0and (240 - x) >= 0 and (0.575 * x - 61 - y) <= 0:
             return True
         else:
             return False
 
     def common_move(self, potential_node, direction_val, direction):
-        """ Common function - Contains steps which are frequently used for directions. Think of it as a utility function."""
         if not self.check_obstacle_space(potential_node):
             move_node = Node(copy.deepcopy(self.state), Node(self.state, self.parent, self.cost, self.distance), self.cost + direction_val, direction_val)
             if direction == 'up':
@@ -75,7 +65,6 @@ class Node:
             return move_node
         return None
 
-    # direction methods
     def up(self):
         potential_node = (self.state[0], self.state[1] + 1)
         up_node = self.common_move(potential_node, 1, "up")
@@ -117,7 +106,6 @@ class Node:
         return down_right
 
     def generate_children(self):
-        """ Generates children by registering switch_ dispatcher """
         children = []
         @self.switch_
         def move():
@@ -152,69 +140,73 @@ class Node:
         return children
     
 
-while(1):
-    # take inputs
-    x1, y1 = map(int, input("Please input the X and Y coordinates of the start node!\n").split())
-    input_node = Node([x1, y1], None, 0, 0)
+if __name__== "__main__":
+    while(1):
+        x1, y1 = map(int, input("Please input the X and Y coordinates of the start node!\n").split())
+        input_node = Node([x1, y1], None, 0, 0)
+        
+        x2, y2 = map(int, input("Please input the X and Y coordinates of the goal node!\n").split())
+        goal_node = Node([x2, y2], None, 1000000, 0)
+        
+        if goal_node.check_obstacle_space(goal_node.state) or input_node.check_obstacle_space(input_node.state):
+            print("Input Coordinates are in obstacle space!")
+        else:
+            break    
+
+    queue = []                  
+    queue.append(input_node)
+
+    visited_states = []
+    t = time.time()
+
+    while(1):
+        queue.sort(key = lambda x: x.cost)
+        current_node = queue.pop(0)
+        print(current_node, end = '\n')
+        if current_node.state == [x2, y2]:
+            print("Goal Found\n")
+            print("Shortest path:\n")
+            print(current_node.state)
     
-    x2, y2 = map(int, input("Please input the X and Y coordinates of the goal node!\n").split())
-    goal_node = Node([x2, y2], None, 9999999, 0)
+            path = []
+            while(current_node.state != [x1, y1]):
+                current_node = current_node.parent
+                path.append(current_node.state)
+                print(current_node)
+            break
+
+        if current_node.state not in visited_states:
+            visited_states.append(current_node.state)
+            children = current_node.generate_children() 
+
+            for child in children:
+                queue.append(child)
+        else:     
+            parent_node = current_node.parent     
+            if current_node.cost > parent_node.cost + current_node.distance:
+                current_node.cost = parent_node.cost + current_node.distance
+    print("Execution time", time.time()-t)
     
-    if goal_node.check_obstacle_space(goal_node.state) or input_node.check_obstacle_space(input_node.state):
-        print("Input Coordinates are in obstacle space!")
-    else:
-        break    
-
-# perform dijkstra's algorithm
-queue = []                  
-queue.append(input_node)
-
-visited_states = []
-t = time.time()
-
-while(1):
-    queue.sort(key = lambda x: x.cost)
-    current_node = queue.pop(0)
-    print(current_node, end = '\n')
-    if current_node.state == [x2, y2]:
-        print("Goal Found\n")
-        print("Shortest path:\n")
-        print(current_node.state)
-
-        path = []
-        while(current_node.state != [x1, y1]):
-            current_node = current_node.parent
-            path.append(current_node.state)
-            print(current_node)
-        break
-
-    if current_node.state not in visited_states:
-        visited_states.append(current_node.state)
-        children = current_node.generate_children() 
-
-        for child in children:
-            queue.append(child)
-    else:     
-        parent_node = current_node.parent     
-        if current_node.cost > parent_node.cost + current_node.distance:
-            current_node.cost = parent_node.cost + current_node.distance
-print("Execution time", time.time()-t)
-
-pygame.init()
-
-WINDOW_WIDTH = 400
-WINDOW_HEIGHT = 250
-CYAN = (0, 255, 255)
-display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-counter = 0
-while True:
-    display_surface.fill((0,0,0))
-    # draw obstacles.
-    pygame.draw.circle(display_surface, CYAN, (300, 65), 40)
-    pygame.draw.polygon(display_surface, CYAN, [[200, 109], [234, 129], [234, 170], [200, 190], [167, 171], [165, 131]])
-    pygame.draw.polygon(display_surface, CYAN, [[36, 65], [115, 40], [80, 70], [106, 150]])
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
+    print("Running pygame animation..................")
+    pygame.init()
+    screen = pygame.display.set_mode((400, 250))
+    counter = 0
+    
+    while True:
+        screen.fill((0,0,0))
+        pygame.draw.circle(screen, (0,0, 255), (300, 65), 40)
+        pygame.draw.polygon(screen, (0,0, 255), [[200, 109], [234, 129], [234, 170], [200, 190], [165, 170], [165, 129]])
+        pygame.draw.polygon(screen, (0,0, 255), [[36, 65], [115, 40], [80, 70], [105, 150]])
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        if counter ==0:
+            for state in visited_states:
+                print(state)        
+                pygame.draw.circle(screen, (255,255,255), (state[0], 250-state[1]), 1) 
+                pygame.display.update()
+            for state in path:
+                pygame.draw.circle(screen, (0,0,255), (state[0], 250-state[1]), 1)
+            pygame.display.update()
+        counter +=1    
