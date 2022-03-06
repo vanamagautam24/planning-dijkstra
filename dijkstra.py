@@ -152,6 +152,53 @@ class Node:
         return children
     
 
+while(1):
+    # take inputs
+    x1, y1 = map(int, input("Please input the X and Y coordinates of the start node!\n").split())
+    input_node = Node([x1, y1], None, 0, 0)
+    
+    x2, y2 = map(int, input("Please input the X and Y coordinates of the goal node!\n").split())
+    goal_node = Node([x2, y2], None, 9999999, 0)
+    
+    if goal_node.check_obstacle_space(goal_node.state) or input_node.check_obstacle_space(input_node.state):
+        print("Input Coordinates are in obstacle space!")
+    else:
+        break    
+
+# perform dijkstra's algorithm
+queue = []                  
+queue.append(input_node)
+
+visited_states = []
+t = time.time()
+
+while(1):
+    queue.sort(key = lambda x: x.cost)
+    current_node = queue.pop(0)
+    print(current_node, end = '\n')
+    if current_node.state == [x2, y2]:
+        print("Goal Found\n")
+        print("Shortest path:\n")
+        print(current_node.state)
+
+        path = []
+        while(current_node.state != [x1, y1]):
+            current_node = current_node.parent
+            path.append(current_node.state)
+            print(current_node)
+        break
+
+    if current_node.state not in visited_states:
+        visited_states.append(current_node.state)
+        children = current_node.generate_children() 
+
+        for child in children:
+            queue.append(child)
+    else:     
+        parent_node = current_node.parent     
+        if current_node.cost > parent_node.cost + current_node.distance:
+            current_node.cost = parent_node.cost + current_node.distance
+print("Execution time", time.time()-t)
 
 pygame.init()
 
