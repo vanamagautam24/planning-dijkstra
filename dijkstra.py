@@ -5,6 +5,34 @@ import pygame
 import sys
 import copy
 
+class Node:
+    def __init__(self, state, parent, cost, distance):
+        self.state = state              
+        self.parent = parent                   
+        self.cost = cost
+        self.distance = distance 
+
+    def __repr__(self):
+        return str(self.state)
+    
+    def switch_(self, fn):
+        registry = dict()
+        registry['default'] = fn
+
+        def register(case):
+            def inner(fn):
+                registry[case] = fn
+                return fn
+            return inner
+        
+        def decorator(case):
+            fn = registry.get(case, registry['default'])
+            return fn()
+        
+        decorator.register = register
+        return decorator
+
+
 pygame.init()
 
 WINDOW_WIDTH = 400
